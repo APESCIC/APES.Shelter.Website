@@ -1,5 +1,10 @@
 # Public Website Changelog
 
+## [0.1.3] - 2026-11-10
+
+- Maintenance release: the website looks and works as before.
+- The footer version label now reads v0.1.3.
+- Releases are now published from a version tag and deployed with a checked, reversible deploy script.
 ## v0.1.2 Stable - 19 August 2026
 
 - Public postal address now includes Merseyside: 40 Morris Street, St Helens, Merseyside, WA9 3EN.

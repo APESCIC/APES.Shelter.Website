@@ -1,0 +1,14 @@
+{
+    "project": "apes-shelter-website",
+    "site": "apes-shelter-website.test",
+    "appUrl": "http://apes-shelter-website.test",
+    "documentRoot": "public",
+    "php": "8.4",
+    "phpThreadSafe": false,
+    "apacheHandler": "fcgid",
+    "database": null,
+    "node": "22",
+    "devServer": "browsersync",
+    "devServerPort": 3102,
+    "devServerUiPort": 3112
+}
