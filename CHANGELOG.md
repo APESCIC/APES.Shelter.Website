@@ -1,5 +1,11 @@
 # APES Shelter and Rescue Website Changelog
 
+## [0.1.3] - 2026-11-10
+
+- Change type: Maintenance. Laragon is the only local set-up: `docs/laragon/`, `scripts/laragon-setup.ps1` and the live preview gate `scripts/preview.ps1`, with Browsersync live reload on port 3102.
+- Change type: Release process. Versions come from the milestone version through `scripts/milestone-version`; `VERSION` is now plain semver (`0.1.3`) and the footer shows `v0.1.3`. Each version ships once: one pull request, one tag, one Release (`release.yml`) and one deploy of that tag (`deploy/cloudron/deploy.ps1 -Tag`, with backup, swap, `/VERSION` check and rollback).
+- Change type: CI. Replaced the Jekyll container CI, which built nothing this site uses, with site checks, PHP lint, PR title and branch checks, dependency review, CodeQL and Dependabot into the `dependencies` branch (#21). Removed the empty `deploy-to-cloudron.yml.txt` (#22).
+- Change type: Release records. Updated root and public `VERSION` files, the footer version label and the changelog records to v0.1.3.
 ## v0.1.2 Stable - 19 August 2026
 
 - Change type: Content. Updated the public postal address to 40 Morris Street, St Helens, Merseyside, WA9 3EN on contact, footer, surrender, privacy and terms pages.
