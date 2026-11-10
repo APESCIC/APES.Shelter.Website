@@ -120,42 +120,20 @@ Development work should support the organisation’s core aims:
 * Reliable forms, links and user journeys
 * Clear communication with adopters, owners, volunteers and supporters
 
-## Branching Guidance
+## Local Development
 
-Suggested branch naming:
+Laragon is the only supported local set-up. Its Apache serves `public/` with the same `.htaccess` rules as Cloudron.
 
-```text
-fix/short-description
-feature/short-description
-content/short-description
-policy/short-description
-accessibility/short-description
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1
 ```
 
-Examples:
+The first links `C:\laragon\www\apes-shelter-website` to your clone so Laragon serves `http://apes-shelter-website.test`. The second pulls the latest changes and starts Browsersync on `http://localhost:3102/`, which reloads on save. Run `php scripts/check-site.php` before committing. See `docs/laragon/profile.md`.
 
-```text
-fix/broken-adoption-link
-feature-new-surrender-form
-content-update-trial-adoptions
-policy-privacy-page-update
-accessibility-mobile-menu
-```
+## How Work Ships
 
-## Commit Message Guidance
-
-Commit messages should be clear and specific.
-
-Examples:
-
-```text
-Fix broken link on adoption process page
-Update surrender guidance wording
-Improve mobile layout on rescue services page
-Add new foster programme content
-Correct contact information in footer
-Refresh shared footer layout and 90 percent page width
-```
+Work ships once per milestone, by the milestone's version: one `milestone/vX-Y-Z-<slug>` branch, one pull request into `main` merged as a merge commit, one `vX.Y.Z` tag and Release, and one deploy of that tag with `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`. Commit messages follow Conventional Commits and name the issue, for example `fix: correct the adoption process link (Refs #12)`. See `CONTRIBUTING.md` and `.cursor/rules/version-shipping.mdc`.
 
 ## Pull Requests
 

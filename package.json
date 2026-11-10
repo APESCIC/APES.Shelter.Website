@@ -1,0 +1,12 @@
+{
+    "name": "apes-shelter-website",
+    "private": true,
+    "description": "APES Shelter and Rescue Website - Laragon live reload and checks",
+    "scripts": {
+        "dev": "browser-sync start --proxy http://apes-shelter-website.test --port 3102 --ui-port 3112 --files \"public/**/*\" --no-open --no-notify",
+        "check": "php scripts/check-site.php"
+    },
+    "devDependencies": {
+        "browser-sync": "^3.0.4"
+    }
+}
