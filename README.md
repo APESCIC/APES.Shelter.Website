@@ -6,9 +6,9 @@ This repository is used to support the development, maintenance, improvement and
 
 ## Current Release Note
 
-Current public release: **v0.1.2 Stable**.
+Current public release: **v0.1.3 Stable**.
 
-This release updates public contact details to 40 Morris Street, St Helens, Merseyside, WA9 3EN and 01744 374 015, and hydrates the info mailbox in JavaScript with `rel="nofollow"` so it is not present as a crawlable mailto in static HTML.
+This maintenance release leaves the website unchanged for visitors. It moves the repository to the APES standards: Laragon preview, versions from the milestone version, tagged releases and deploys, and GitHub security checks.
 
 ## About APES Shelter and Rescue
 
