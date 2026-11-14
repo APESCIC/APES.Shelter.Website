@@ -11,14 +11,19 @@
        matches the tag.
     2. Takes a Cloudron backup of the app.
     3. Packs public/ at the tag with git archive (one .tar.gz) and uploads it with cloudron push.
-    4. Unpacks it next to /app/data/public, refuses if the live site has files the tag does not
-       (unless -AllowRemovals), then swaps the folders with two renames.
+    4. Unpacks it next to /app/data/public, copies live files the tag does not have into it with
+       -KeepLiveFiles, refuses if the live site still has files the tag does not (unless
+       -AllowRemovals), then swaps the folders with two renames.
     5. Checks https://<domain>/VERSION serves the tag's version; swaps the old folder back if not.
 
     Prints the time each stage took. Never prints secrets or credentials.
 
 .PARAMETER Tag
     The release tag to deploy, for example v1.3.0. Never a branch.
+
+.PARAMETER KeepLiveFiles
+    Copy live files that are not in the tag (for example images uploaded only to the server) into the
+    new site unchanged, including names with spaces.
 
 .PARAMETER AllowRemovals
     Let the deploy remove live files that are not in the tag (they stay in the kept previous folder).
@@ -28,6 +33,7 @@ param(
     [Parameter(Mandatory)] [ValidatePattern('^v\d+\.\d+\.\d+$')] [string] $Tag,
     [string] $App = '8d32a986-c650-4d23-b832-c5e4510471a7',
     [string] $Domain = 'www.apesshelter.org.uk',
+    [switch] $KeepLiveFiles,
     [switch] $AllowRemovals
 )
 
@@ -57,8 +63,37 @@ function Stop-Deploy([string] $Message) {
     exit 1
 }
 function Get-LiveVersion {
-    try { (Invoke-WebRequest -UseBasicParsing -TimeoutSec 15 -Headers @{ 'Cache-Control' = 'no-cache' } "https://$Domain/VERSION?deploy=$([guid]::NewGuid())").Content.Trim() }
-    catch { '' }
+    try {
+        $content = (Invoke-WebRequest -UseBasicParsing -TimeoutSec 15 -Headers @{ 'Cache-Control' = 'no-cache' } "https://$Domain/VERSION?deploy=$([guid]::NewGuid())").Content
+        if ($content -is [byte[]]) { $content = [Text.Encoding]::UTF8.GetString($content) }
+        "$content".Trim()
+    } catch { '' }
+}
+function Copy-LiveOnlyFiles {
+    # Pushed as a file because PowerShell 5.1 mangles nested quotes passed to cloudron exec.
+    $script = @'
+set -e
+cd /app/data/public
+find . -type f -exec sh -c '
+for f do
+    if [ ! -e "/app/data/public.next/$f" ]; then
+        mkdir -p "/app/data/public.next/$(dirname "$f")"
+        cp -p "$f" "/app/data/public.next/$f"
+        echo "$f"
+    fi
+done' sh {} +
+chown -R www-data:www-data /app/data/public.next
+'@
+    $local = Join-Path ([IO.Path]::GetTempPath()) "keep-live-files-$Tag.sh"
+    [IO.File]::WriteAllText($local, ($script -replace "`r`n", "`n"), (New-Object Text.UTF8Encoding $false))
+    cloudron push --app $App $local '/tmp/keep-live-files.sh' | Out-Null
+    $pushed = $LASTEXITCODE
+    Remove-Item $local
+    if ($pushed) { Stop-Deploy 'cloudron push of the keep-live-files script failed' }
+    $kept = @(Invoke-App sh /tmp/keep-live-files.sh | Where-Object { $_ })
+    if ($LASTEXITCODE) { Stop-Deploy 'keeping the live-only files failed' }
+    Invoke-App rm -f /tmp/keep-live-files.sh | Out-Null
+    return , $kept
 }
 
 Push-Location $repo
@@ -97,11 +132,16 @@ try {
     Write-Step 'Unpacking and comparing with the live site'
     Invoke-App sh -c "set -e; cd /app/data; rm -rf public.next; mkdir public.next; tar -xzf /tmp/site-$Tag.tar.gz -C public.next --strip-components=1; rm -f /tmp/site-$Tag.tar.gz; chown -R www-data:www-data public.next" | Out-Host
     if ($LASTEXITCODE) { Stop-Deploy 'unpacking on the app failed' }
+    if ($KeepLiveFiles) {
+        $kept = Copy-LiveOnlyFiles
+        Write-Host "  Kept $($kept.Count) live file(s) that are not in ${Tag}:"
+        $kept | Select-Object -First 20 | ForEach-Object { Write-Host "    $_" }
+    }
     $removed = @(Invoke-App sh -c 'cd /app/data/public && find . -type f | sort > /tmp/live.txt; cd /app/data/public.next && find . -type f | sort > /tmp/next.txt; comm -23 /tmp/live.txt /tmp/next.txt; rm -f /tmp/live.txt /tmp/next.txt' | Where-Object { $_ })
     if ($removed.Count -gt 0) {
         Write-Host "  $($removed.Count) live file(s) are not in ${Tag}:"
         $removed | Select-Object -First 20 | ForEach-Object { Write-Host "    $_" }
-        if (-not $AllowRemovals) { Stop-Deploy 'the live site has files the tag does not. Add them to git, or rerun with -AllowRemovals' }
+        if (-not $AllowRemovals) { Stop-Deploy 'the live site has files the tag does not. Add them to git, or rerun with -KeepLiveFiles or -AllowRemovals' }
     }
     Complete-Stage 'unpack'
 
