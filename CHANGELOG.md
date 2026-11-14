@@ -1,5 +1,13 @@
 # APES Shelter and Rescue Website Changelog
 
+## [0.1.4] - 2026-11-14
+
+- Change type: Maintenance. Laravel Herd is the only local set-up (#34): `scripts/herd-setup.ps1`, `docs/herd/`, `.cursor/rules/herd-local-dev.mdc` and the rewritten live preview gate `scripts/preview.ps1`, with Browsersync live reload on port 3102. The Laragon set-up script, profile and rule are removed.
+- Change type: Maintenance. `LocalValetDriver.php` applies the `public/.htaccess` redirects, `DirectoryIndex`, `Options -Indexes` and `ErrorDocument 404` under Herd's nginx, so the local preview matches Cloudron's Apache. It is outside `public/` and is not deployed.
+- Change type: Deploy. `deploy/cloudron/deploy.ps1` decodes the `/VERSION` body before comparing it, so the version check no longer rolls back a good deploy, and gains `-KeepLiveFiles` to keep live-only files (#32).
+- Change type: Agent files. `AGENTS.md` follows the Cursor precedence model and describes the Herd preview, checks, decisions and where things live.
+- Change type: Release records. Updated root and public `VERSION` files, the footer version label and the changelog records to v0.1.4.
+
 ## [0.1.3] - 2026-11-10
 
 - Change type: Maintenance. Laragon is the only local set-up: `docs/laragon/`, `scripts/laragon-setup.ps1` and the live preview gate `scripts/preview.ps1`, with Browsersync live reload on port 3102.

@@ -6,9 +6,9 @@ This repository is used to support the development, maintenance, improvement and
 
 ## Current Release Note
 
-Current public release: **v0.1.3 Stable**.
+Current public release: **v0.1.4 Stable**.
 
-This maintenance release leaves the website unchanged for visitors. It moves the repository to the APES standards: Laragon preview, versions from the milestone version, tagged releases and deploys, and GitHub security checks.
+This maintenance release leaves the website unchanged for visitors. Local development moves to Laravel Herd, with the same redirects and error pages as the live site, and the deploy script checks the live version correctly and can keep live-only files.
 
 ## About APES Shelter and Rescue
 
@@ -122,14 +122,14 @@ Development work should support the organisation’s core aims:
 
 ## Local Development
 
-Laragon is the only supported local set-up. Its Apache serves `public/` with the same `.htaccess` rules as Cloudron.
+Laravel Herd is the local set-up. Its nginx serves `public/` on PHP 8.4, and `LocalValetDriver.php` applies the same `.htaccess` redirects and error pages as Cloudron's Apache.
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1
 ```
 
-The first links `C:\laragon\www\apes-shelter-website` to your clone so Laragon serves `http://apes-shelter-website.test`. The second pulls the latest changes and starts Browsersync on `http://localhost:3102/`, which reloads on save. Run `php scripts/check-site.php` before committing. See `docs/laragon/profile.md`.
+The first links your clone in Herd as `http://apes-shelter-website.test`. The second pulls the latest changes and starts Browsersync on `http://localhost:3102/`, which reloads on save. Run `php scripts/check-site.php` before committing. See `docs/herd/profile.md`.
 
 ## How Work Ships
 

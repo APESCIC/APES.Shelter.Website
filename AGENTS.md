@@ -1,8 +1,21 @@
 # Agent instructions for APES Shelter and Rescue Website
 
-APES Shelter and Rescue Website (`https://www.apesshelter.org.uk`) is maintained by the Association of Protecting Exotic Species CIC (APES CIC). It is a static HTML, CSS and JavaScript website served from `public/`, with the shared header and footer in `public/includes/`. The owner is Bambie Murphy, Director. Write UK English (organisation, behaviour, colour, licence) in the site, docs, issues and pull requests.
+Cursor's user rules and skills set how work is done here (branches, issues, pull requests, merge, release, deploy, ship gate, decisions and safety). This file describes this repository and fills the named slots below. If anything here disagrees with them, Cursor's rules win and this file is corrected in the same milestone.
 
-This file is the source of truth for agents. How work ships is in [`.cursor/rules/version-shipping.mdc`](.cursor/rules/version-shipping.mdc) and local development in [`.cursor/rules/laragon-local-dev.mdc`](.cursor/rules/laragon-local-dev.mdc); this file points to them rather than repeating them.
+The owner is Bambie Murphy, Director. Write UK English (organisation, behaviour, colour, licence) in the site, docs, issues and pull requests. Never print, paste or commit secrets.
+
+## About the app
+
+APES Shelter and Rescue Website (`https://www.apesshelter.org.uk`) is the public website of APES Shelter and Rescue, maintained by the Association of Protecting Exotic Species CIC (APES CIC). Visitors use it for rescue, surrender, adoption, fostering, sponsorship, welfare guidance and policies. Repo-specific shipping details are in [`.cursor/rules/version-shipping.mdc`](.cursor/rules/version-shipping.mdc) and local preview values in [`.cursor/rules/herd-local-dev.mdc`](.cursor/rules/herd-local-dev.mdc).
+
+- Repository: `APESCIC/APES.Shelter.Website`. Work only in this repository.
+
+## Stack and architecture
+
+- Static HTML, CSS and browser JavaScript served from `public/` (selected website type: static, with PHP available for support tooling). No database, no build step for the deployed site.
+- The shared header and footer are in `public/includes/`. Old URLs are redirected by `public/.htaccess`, which also sets the branded 404 page.
+- PHP 8.4 on Cloudron and locally. PHP is used only by the support scripts in `scripts/` and any `.php` page under `public/`.
+- Node 22 is used locally only, for Browsersync live reload.
 
 ## Ground rules
 
@@ -12,19 +25,34 @@ This file is the source of truth for agents. How work ships is in [`.cursor/rule
 - Every Cloudron app is production. Read-only commands (status, logs) run freely. A deploy needs the ship-gate answer in the current chat. Any other change needs an AskQuestion answer with `Back up, then <change> (Recommended)` first. Don't change DNS or Cloudflare.
 - Security checks use GitHub's free features only: Dependabot (into the `dependencies` branch), dependency review and CodeQL. Don't add paid or third-party scanners.
 
-## Local development (Laragon)
+## Local development and preview
 
-Laragon is the only supported local set-up; never suggest `php -S`, XAMPP, WAMP, containers or virtual machines. Run the live preview gate before any change: `scripts\preview.ps1`, then open the preview in Cursor's browser and say "Preview ready, starting work". Full steps: [`laragon-local-dev.mdc`](.cursor/rules/laragon-local-dev.mdc).
+Laravel Herd serves this site locally. The preview gate steps are Cursor's `live-preview-gate` and `herd-local-preview` skills; the values are in [`herd-local-dev.mdc`](.cursor/rules/herd-local-dev.mdc).
 
 | Item | Value |
 | --- | --- |
-| Site | `http://apes-shelter-website.test`, served by Laragon's Apache from `public/` through the junction `C:\laragon\www\apes-shelter-website` |
-| Live reload | `npm run dev`: Browsersync on `http://localhost:3102` |
-| PHP | Laragon's PHP 8.4 NTS through FastCGI, as on Cloudron (8.4). Only `.php` files use it |
+| Clone | `C:\Users\BambieMurphy\Documents\GitHub\APES.Shelter.Website` |
+| Herd site | `apes-shelter-website` (linked; PHP 8.4 isolated, as on Cloudron) |
+| Preview URL | `http://apes-shelter-website.test`, served by Herd's nginx from `public/` through [`LocalValetDriver.php`](LocalValetDriver.php) |
+| Preview command | `scripts\preview.ps1`, then open `http://localhost:3102` (Browsersync, UI on 3112) |
+| HMR port | None (no Vite); Browsersync reloads on save on port 3102 |
+| Env file | None |
 | Database | None, so there is no demo seeder |
-| Set up or repair | `scripts\laragon-setup.ps1` |
-| Site checks | `php scripts/check-site.php` (also run by CI) |
-| Profile | [docs/laragon/profile.md](docs/laragon/profile.md) |
+| Mail | None (the site sends no mail) |
+| Set up or repair | `scripts\herd-setup.ps1` |
+| Profile | [docs/herd/profile.md](docs/herd/profile.md) |
+
+- Herd's nginx ignores `public/.htaccess`. `LocalValetDriver.php` reads it on every request and applies its redirects, `DirectoryIndex`, `Options -Indexes` and `ErrorDocument 404`, so the preview behaves like Cloudron's Apache. Edit `.htaccess` only.
+- In agent shells put Herd first on `PATH`: `$env:Path = "$env:USERPROFILE\.config\herd\bin;C:\Program Files\nodejs;$env:Path"`.
+
+## Tests and checks
+
+| Check | Command |
+| --- | --- |
+| Site checks | `php scripts/check-site.php` (VERSION files, page language and title, sitemap, robots, 404 page) |
+| PHP lint | `php -l` on every tracked `.php` file (run by CI) |
+| Names | `php scripts/milestone-version check-title "<title>"`, `check-branch "<branch>"` |
+| CI workflows | `.github/workflows/ci.yml`, `milestone-version-check.yml`, `dependency-review.yml`, `codeql.yml` |
 
 ## Shipping and versioning
 
@@ -57,12 +85,24 @@ Nothing reaches `main`, and nothing is tagged, released or deployed, before stag
 | App | Cloudron LAMP app `8d32a986-c650-4d23-b832-c5e4510471a7` |
 | Domain | `https://www.apesshelter.org.uk` |
 | Web root | `/app/data/public` (PHP 8.4, set by `/app/data/PHP_VERSION`) |
-| Deploy | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`: backup, upload the tag's `public/`, swap, check `/VERSION`, roll back on failure |
+| Deploy | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`: backup, upload the tag's `public/`, swap, check `/VERSION`, roll back on failure. `-KeepLiveFiles` keeps live-only files; `-AllowRemovals` lets them go |
 
 ## Site specifics
 
 - The shared header and footer are in `public/includes/`; `footer.html` carries the version, which `bump` sets.
 - `APES Shelter and Rescue Website Logo Pack/` holds the source brand files; only the copies under `public/assets/` are served.
+
+## Decisions and gotchas
+
+- 2026-11-14: Laravel Herd is the only local set-up (Bambie, #34). The site keeps its `apes-shelter-website.test` name.
+- Apache escapes `#` in `.htaccess` redirect targets unless the rule has `[NE]`, so `/services/adoptions/adoption-process` redirects to `/adoptions.html%23process`. The Herd driver mirrors this.
+- `Invoke-WebRequest` returns `/VERSION` as bytes (no file extension); decode it before comparing (#32).
+
+## Where to find things
+
+- Local preview: [docs/herd/profile.md](docs/herd/profile.md). Deploy: [deploy/cloudron/](deploy/cloudron/).
+- Change logs: [CHANGELOG.md](CHANGELOG.md), [public/CHANGELOG.md](public/CHANGELOG.md) and the Change Log Hub page [public/changelog.html](public/changelog.html).
+- Contributor guide: [CONTRIBUTING.md](CONTRIBUTING.md). QA checklist and page manifest: `public/docs/`.
 
 # Website standards
 
@@ -353,7 +393,7 @@ Required Cloudron LAMP checks before completion:
 10. UK GDPR, consent, retention, security, and audit implications are noted for forms or stored personal data.
 11. README, changelog, Change Log Hub, version records, generated output, and issue updates reflect the hosting impact.
 12. Local preview remains aligned with Cloudron LAMP assumptions.
-13. The changed pages have been checked in the Laragon preview (`http://apes-shelter-website.test`, or Browsersync on `http://localhost:3102`).
+13. The changed pages have been checked in the Herd preview (`http://apes-shelter-website.test`, or Browsersync on `http://localhost:3102`).
 14. Direct `file:///` access has been checked for browser served static pages and public assets where applicable, or a justified server required blocker has been recorded.
 
 ## Security, safety, and UK GDPR rules

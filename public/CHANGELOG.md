@@ -1,5 +1,12 @@
 # Public Website Changelog
 
+## [0.1.4] - 2026-11-14
+
+- Maintenance release: the website looks and works as before.
+- The footer version label now reads v0.1.4.
+- The team now previews the website locally with the same redirects and error pages as the live site.
+- Deploys check the live version correctly and can keep files that exist only on the live server.
+
 ## [0.1.3] - 2026-11-10
 
 - Maintenance release: the website looks and works as before.
