@@ -85,7 +85,7 @@ Nothing reaches `main`, and nothing is tagged, released or deployed, before stag
 | App | Cloudron LAMP app `8d32a986-c650-4d23-b832-c5e4510471a7` |
 | Domain | `https://www.apesshelter.org.uk` |
 | Web root | `/app/data/public` (PHP 8.4, set by `/app/data/PHP_VERSION`) |
-| Deploy | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`: backup, upload the tag's `public/`, swap, check `/VERSION`, roll back on failure |
+| Deploy | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`: backup, upload the tag's `public/`, swap, check `/VERSION`, roll back on failure. `-KeepLiveFiles` keeps live-only files; `-AllowRemovals` lets them go |
 
 ## Site specifics
 
