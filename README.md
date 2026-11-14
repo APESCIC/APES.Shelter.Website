@@ -6,9 +6,9 @@ This repository is used to support the development, maintenance, improvement and
 
 ## Current Release Note
 
-Current public release: **v0.1.3 Stable**.
+Current public release: **v0.1.4 Stable**.
 
-This maintenance release leaves the website unchanged for visitors. It moves the repository to the APES standards: Laragon preview, versions from the milestone version, tagged releases and deploys, and GitHub security checks.
+This maintenance release leaves the website unchanged for visitors. Local development moves to Laravel Herd, with the same redirects and error pages as the live site, and the deploy script checks the live version correctly and can keep live-only files.
 
 ## About APES Shelter and Rescue
 
