@@ -77,7 +77,7 @@ Every Cloudron app is production. Read-only status/logs are fine; deploy only af
 | Cloudron app ID | `8d32a986-c650-4d23-b832-c5e4510471a7` |
 | Domain | `https://www.apesshelter.org.uk` |
 | Web root | `/app/data/public` (PHP 8.4 via `/app/data/PHP_VERSION`) |
-| Deploy command | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z` (`-KeepLiveFiles` / `-AllowRemovals` as needed) |
+| Deploy command | `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z` (break-glass: `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`) |
 | Deploys | The release tag (never a branch) |
 | Auto-deploy couplings | None |
 | Health URL | `https://www.apesshelter.org.uk/VERSION` |
