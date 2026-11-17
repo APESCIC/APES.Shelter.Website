@@ -2,7 +2,7 @@
 
 Cursor's user rules and skills set how work is done here (branches, issues, pull requests, merge, release, deploy, ship gate, decisions and safety). This file describes this repository and fills the named slots below. If anything here disagrees with them, Cursor's rules win and this file is corrected in the same milestone.
 
-Org layout for Cursor/agent files: [APES Cursor and agent standards](https://github.com/apescic-director/Cursor/blob/main/docs/cursor-agent-standards.md) (in the Cursor ops hub; switch the link to `main` once that PR merges).
+Cursor user rules and personal skills (Agent Store) own process; this file fills named slots only.
 
 The owner is Bambie Murphy, Director. Write UK English (organisation, behaviour, colour, licence) in the site, docs, issues and pull requests. Never print, paste or commit secrets. Secrets live only in APES Vault (Bitwarden). Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH` milestones — never Linear.
 
@@ -77,7 +77,7 @@ Every Cloudron app is production. Read-only status/logs are fine; deploy only af
 | Cloudron app ID | `8d32a986-c650-4d23-b832-c5e4510471a7` |
 | Domain | `https://www.apesshelter.org.uk` |
 | Web root | `/app/data/public` (PHP 8.4 via `/app/data/PHP_VERSION`) |
-| Deploy command | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z` (`-KeepLiveFiles` / `-AllowRemovals` as needed) |
+| Deploy command | `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z` (break-glass: `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`) |
 | Deploys | The release tag (never a branch) |
 | Auto-deploy couplings | None |
 | Health URL | `https://www.apesshelter.org.uk/VERSION` |
